@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .ct {
+            max-width: 1700px;
+            box-shadow: 0 0 30px rgba(27, 27, 27, 0.3);
+            margin: 50px auto;
+            font-size: 0;
+        }
+
+    </style>
+    <title>木桶流</title>
+</head>
+<body>
+<div class="ct"></div>
+<script src='jquery-3.2.1.js'></script>
+<!--https://dummyimage.com/600x400/000/fff&text=Image-->
+<!--200/img.height*img.width-->
+<script>
+  function Bucket($ct) {
+    this.$ct = $ct
+    this.rowList = [];
+    this.loadImg();
+  }
+  Bucket.prototype = {
+    loadImg: function () {
+      var imgs = this.getImageUrl(100);
+      var _this = this;
+        imgs.forEach(function (e) {
+          var img = new Image;
+          img.src = e;
+          img.onload = function () {
+            var imgInfo = {
+              target: img,
+              width: 200 * (img.width / img.height),
+              height: 200
+            };
+            _this.render(imgInfo)
+          }
+          })
+    },
+
+
+    getImageUrl: function (num) {
+      var fontColor,
+        bgc,
+        width,
+        height,
+        url = [];
+      for (var i = 0; i < num; i++) {
+        fontColor = Math.random().toString(16).substring(2, 8);
+        bgc = Math.random().toString(16).substring(2, 8);
+        width = parseInt(Math.random() * 100 + 200);
+        height = parseInt(Math.random() * 100 + 200);
+        url.push('https://dummyimage.com/' + width + 'x' + height + '/' + fontColor + '/' + bgc + '&text=Image')
+      }
+      return url
+    },
+
+
+    render: function (imgInfo) {
+      var rowWidth = 0;
+      var rowCtWidth = this.$ct.width()
+      var newRowHeight = 0;
+      this.rowList.push(imgInfo)
+      for (var i = 0; i < this.rowList.length; i++) {
+        rowWidth += this.rowList[i].width;
+      }
+      if (rowWidth > rowCtWidth) {
+        this.rowList.pop()
+        rowWidth -= imgInfo.width
+        newRowHeight = rowCtWidth * 200 /rowWidth;
+        this.createImgCt(newRowHeight);
+        this.rowList = [];
+        this.rowList.push(imgInfo);
+      }
+    },
+
+
+    createImgCt: function (newRowHeight) {
+      var $rowCt = $('<div class=\'rowCt\'></div>');
+      this.rowList.forEach(function (imgInfo) {
+        var $img = $(imgInfo.target);
+        $img.height(newRowHeight);
+        $($rowCt).append($img);
+      })
+      $rowCt.height = newRowHeight;
+      $rowCt.css('padding', '10px 0')
+      this.$ct.append($rowCt);
+    }
+  }
+var bucket = new Bucket($('.ct'))
+
+</script>
+</body>
+</html>
